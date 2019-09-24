@@ -11,3 +11,5 @@
 > AtlasLoot 副本掉落 v8.10.00
 
 > LoseControl 控制技能显示 v6.09
+
+> Recount 伤害统计 v8.2.0d
