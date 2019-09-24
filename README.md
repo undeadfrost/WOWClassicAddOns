@@ -10,8 +10,10 @@
 
 > AtlasLoot 副本掉落 v8.10.00
 
-> LoseControl 控制技能显示 v6.09
+> ClassicAuraDurations 控制技能显示 v1.13.31
 
 > Recount 伤害统计 v8.2.0d
 
 > VendorPrice 物品价格显示shift v1.2.6
+
+> RealMobHealth 血量模拟 v2.12
