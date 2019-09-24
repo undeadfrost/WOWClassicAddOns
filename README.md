@@ -13,3 +13,5 @@
 > LoseControl 控制技能显示 v6.09
 
 > Recount 伤害统计 v8.2.0d
+
+> VendorPrice 物品价格显示shift v1.2.6
