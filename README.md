@@ -8,7 +8,7 @@
 
 > Bagnon 背包 v8.2.13
 
-> AtlasLoot 副本掉落 v8.10.00
+> AtlasLoot 副本掉落、副本地图 v8.10.00
 
 > ClassicAuraDurations 控制技能显示 v1.13.31
 
@@ -17,3 +17,11 @@
 > VendorPrice 物品价格显示shift v1.2.6
 
 > RealMobHealth 血量模拟 v2.12
+
+> QuestLogEx 任务面板增强 v1.2
+
+> ClassicAuraDurations 目标buff debuff显示 v1.13.31
+
+> oGlow 装备染色
+
+> TinyTooltip 鼠标指针增强
