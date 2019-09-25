@@ -27,3 +27,5 @@
 > TinyTooltip 鼠标指针增强
 
 > DismountMe 自动下马站立
+
+> Fizzle 装备耐久度 v80200-4
