@@ -25,3 +25,5 @@
 > oGlow 装备染色
 
 > TinyTooltip 鼠标指针增强
+
+> DismountMe 自动下马站立
