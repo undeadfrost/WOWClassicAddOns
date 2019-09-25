@@ -29,3 +29,5 @@
 > ClassicAutoDismount 自动下马
 
 > Fizzle 装备耐久度 v80200-4
+
+> CharacterStatsClassic 角色属性详情 v1.9.1
