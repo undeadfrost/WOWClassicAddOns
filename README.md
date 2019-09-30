@@ -31,3 +31,5 @@
 > Fizzle 装备耐久度 v80200-4
 
 > CharacterStatsClassic 角色属性详情 v1.9.1
+
+> Quartz 施法条延迟 v3.5.2
