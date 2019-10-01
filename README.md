@@ -1,35 +1,39 @@
 ## 介绍
 
-> ClassicCastbars 读条显示 v1.0.7
+> ClassicCastbars 读条显示 v1.0.8
 
-> Mapster 地图 v1.8.4
+> Mapster 地图 v1.8.5
 
 > Quesite 任务 v4.1.1
 
-> Bagnon 背包 v8.2.13
+> Bagnon 背包 v8.2.15
 
-> AtlasLoot 副本掉落、副本地图 v8.10.00
+> AtlasLootClassic 副本掉落 v1.2.0
 
-> ClassicAuraDurations 控制技能显示 v1.13.31
+> AtlasLootClassic_Maps 副本地图 v1.0.0 (依赖AtlasLootClassic)
 
-> Recount 伤害统计 v8.2.0d
+> Recount 伤害统计 v8.2.5a
 
-> VendorPrice 物品价格显示shift v1.2.6
+> VendorPrice 物品价格显示 v1.2.8
 
-> RealMobHealth 血量模拟 v2.12
+> RealMobHealth 血量模拟 v2.13
 
-> QuestLogEx 任务面板增强 v1.2
+> QuestGuru 任务面板增强 v2.1.7
 
-> ClassicAuraDurations 目标buff debuff显示 v1.13.31
+> ClassicAuraDurations 目标buff debuff显示 v1.13.32
 
-> oGlow 装备染色
+> oGlow 装备染色 v2.2.8
 
-> TinyTooltip 鼠标指针增强
+> TinyTooltip 鼠标指针增强 v1.2.1
 
-> ClassicAutoDismount 自动下马
+> ClassicAutoDismount 自动下马 v1.01
 
 > Fizzle 装备耐久度 v80200-4
 
+<<<<<<< HEAD
 > CharacterStatsClassic 角色属性详情 v1.9.1
 
 > Quartz 施法条延迟 v3.5.2
+=======
+> CharacterStatsClassic 角色属性详情 v2.0
+>>>>>>> 7ff229f92c3faa304b7d95be936cf30f1c93f5a3
