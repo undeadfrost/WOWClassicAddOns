@@ -2,7 +2,7 @@
 
 > ClassicCastbars 读条显示 v1.0.8
 
-> Mapster 地图 v1.8.5
+> Leatrix Maps 地图增强 v1.13.2
 
 > Quesite 任务 v4.1.1
 
