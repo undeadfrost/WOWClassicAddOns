@@ -2,7 +2,7 @@
 
 > ClassicCastbars 读条显示 v1.0.8
 
-> Leatrix Maps 地图增强 v1.13.2
+> Leatrix Maps 地图增强 v1.13.2 /ltm打开设置
 
 > Quesite 任务 v4.1.2
 
