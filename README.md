@@ -4,7 +4,7 @@
 
 > Mapster 地图 v1.8.5
 
-> Quesite 任务 v4.1.1
+> Quesite 任务 v4.1.2
 
 > Bagnon 背包 v8.2.15
 
