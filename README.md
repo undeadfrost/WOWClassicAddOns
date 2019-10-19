@@ -1,6 +1,6 @@
 ## 介绍
 
-> ClassicCastbars 读条显示 v1.0.8
+> ClassicCastbars 读条显示 v1.1.1
 
 > Leatrix Maps 地图增强 v1.13.2 /ltm打开设置
 
