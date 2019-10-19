@@ -33,3 +33,5 @@
 > CharacterStatsClassic 角色属性详情 v1.9.1
 
 > Quartz 施法条延迟 v3.5.2
+
+> Leatrix_Plus 小工具 v1.13.35

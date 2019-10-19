@@ -23,7 +23,6 @@ local castSpellIDs = {
     1452, -- Arcane Spirit IV
     1453, -- Arcane Spirit V
     25181, -- Arcane Weakness
-    16081, -- Arctic Wolf
     8000, -- Area Burn
     10418, -- Arugal spawn-in spell
     7124, -- Arugal's Gift
@@ -65,16 +64,7 @@ local castSpellIDs = {
     20733, -- Black Arrow
     22719, -- Black Battlestrider
     27589, -- Black Grasp of the Destroyer
-    17461, -- Black Ram
     7279, -- Black Sludge
-    470, -- Black Stallion
-    22718, -- Black War Kodo
-    22720, -- Black War Ram
-    22721, -- Black War Raptor
-    22717, -- Black War Steed
-    22723, -- Black War Tiger
-    22724, -- Black War Wolf
-    578, -- Black Wolf
     23639, -- Blackfury
     23652, -- Blackguard
     16978, -- Blazing Rapier
@@ -84,9 +74,6 @@ local castSpellIDs = {
     15783, -- Blizzard
     3264, -- Blood Howl
     16986, -- Blood Talon
-    10969, -- Blue Mechanostrider
-    6897, -- Blue Ram
-    17463, -- Blue Skeletal Horse
     11365, -- Bly's Band's Escape
     9143, -- Bomb
     1980, -- Bombard
@@ -102,11 +89,6 @@ local castSpellIDs = {
     28352, -- Breath of Sargeras
     8090, -- Bright Baubles
     7359, -- Bright Campfire
-    458, -- Brown Horse
-    18990, -- Brown Kodo
-    6899, -- Brown Ram
-    17464, -- Brown Skeletal Horse
-    6654, -- Brown Wolf
     17293, -- Burning Winds
     26381, -- Burrow
     20364, -- Bury Samuel's Remains
@@ -263,7 +245,6 @@ local castSpellIDs = {
     9435, -- Detonation
     6700, -- Dimensional Portal
     13692, -- Dire Growl
-    6653, -- Dire Wolf
     1842, -- Disarm Trap
     27891, -- Disease Buffet
     11397, -- Diseased Shot
@@ -305,7 +286,6 @@ local castSpellIDs = {
     23679, -- Elementals Deck
     26636, -- Elune's Candle
     16533, -- Emberseer Start
-    8395, -- Emerald Raptor
     22647, -- Empower Pet
     7081, -- Encage
     4962, -- Encasing Webs
@@ -405,7 +385,6 @@ local castSpellIDs = {
     19943, -- Flash of Light
     9092, -- Flesh Eating Worm
     14292, -- Fling Torch
-    17458, -- Fluorescent Green Mechanostrider
     3678, -- Focusing
     24189, -- Force Punch
     22797, -- Force Reactive Disk
@@ -430,12 +409,9 @@ local castSpellIDs = {
     3595, -- Frost Oil
     17460, -- Frost Ram
     25178, -- Frost Weakness
-    10181, -- Frostbolt
     8398, -- Frostbolt Volley
     16992, -- Frostguard
     6957, -- Frostmane Strength
-    16056, -- Frostsaber
-    23509, -- Frostwolf Howler
     25840, -- Full Heal
     474, -- Fumble
     507, -- Fumble II
@@ -456,26 +432,15 @@ local castSpellIDs = {
     7023, -- Goblin Camera Connection
     10837, -- Goblin Land Mine
     12722, -- Goblin Radio
-    16060, -- Golden Sabercat
     24967, -- Gong
     11434, -- Gong Zul'Farrak Gong
     22789, -- Gordok Green Grog
     22924, -- Grasping Vines
-    18989, -- Gray Kodo
-    6777, -- Gray Ram
-    459, -- Gray Wolf
-    23249, -- Great Brown Kodo
-    23248, -- Great Gray Kodo
     25807, -- Great Heal
-    23247, -- Great White Kodo
     15441, -- Greater Arcane Amalgamation
     24997, -- Greater Dispel
     25314, -- Greater Heal
     10228, -- Greater Invisibility
-    18991, -- Green Kodo
-    17453, -- Green Mechanostrider
-    17465, -- Green Skeletal Warhorse
-    7636, -- Green Woolen Robe
     24195, -- Grom's Tribute
     4153, -- Guile of the Raptor
     24266, -- Gurubashi Mojo Madness
@@ -521,7 +486,6 @@ local castSpellIDs = {
     16869, -- Ice Tomb
     28526, -- Icebolt
     11131, -- Icicle
-    17459, -- Icy Blue Mechanostrider
     6741, -- Identify Brood
     23316, -- Ignite Flesh
     23054, -- Igniting Kroshius
@@ -550,7 +514,6 @@ local castSpellIDs = {
     885, -- Invisibility
     16746, -- Invulnerable Mail
     4068, -- Iron Grenade
-    10795, -- Ivory Raptor
     23140, -- J'eevee summons object
     23122, -- Jaina's Autograph
     9744, -- Jarkal's Translation
@@ -566,7 +529,6 @@ local castSpellIDs = {
     22790, -- Kreeg's Stout Beatdown
     4065, -- Large Copper Bomb
     4075, -- Large Seaforium Charge
-    580, -- Large Timber Wolf
     27146, -- Left Piece of Lord Valthalak's Amulet
     15463, -- Legendary Arcane Amalgamation
     10788, -- Leopard
@@ -643,7 +605,6 @@ local castSpellIDs = {
     5213, -- Molten Metal
     25150, -- Molten Rain
     20528, -- Mor'rogal Enchant
-    16084, -- Mottled Red Raptor
     14928, -- Nagmara's Love Potion
     25688, -- Narain!
     7967, -- Naralex's Nightmare
@@ -652,11 +613,9 @@ local castSpellIDs = {
     7673, -- Nether Gem
     8088, -- Nightcrawlers
     23653, -- Nightfall
-    16055, -- Nightsaber
     6199, -- Nostalgia
     7994, -- Nullify Mana
     16528, -- Numbing Pain
-    10798, -- Obsidian Raptor
     11437, -- Opening Chest
     23125, -- Orcish Orphan Whistle
     26063, -- Ouro Submerge Visual
@@ -664,7 +623,6 @@ local castSpellIDs = {
     16379, -- Ozzie Explodes
     471, -- Palamino Stallion
     16082, -- Palomino Stallion
-    10787, -- Panther
     17176, -- Panther Cage Key
     8363, -- Parasite
     6758, -- Party Fever
@@ -676,7 +634,6 @@ local castSpellIDs = {
     6461, -- Pick Lock
     16429, -- Piercing Shadow
     4982, -- Pillar Delving
-    472, -- Pinto Horse
     15728, -- Plague Cloud
     3429, -- Plague Mind
     28614, -- Pointy Spike
@@ -713,8 +670,6 @@ local castSpellIDs = {
     15050, -- Psychometry
     16072, -- Purify and Place Food
     22313, -- Purple Hands
-    17455, -- Purple Mechanostrider
-    23246, -- Purple Skeletal Warhorse
     18809, -- Pyroblast
     3229, -- Quick Bloodlust
     4979, -- Quick Flame Ward
@@ -731,11 +686,6 @@ local castSpellIDs = {
     22563, -- Recall
     21950, -- Recite Words of Celebras
     4093, -- Reconstruction
-    17456, -- Red & Blue Mechanostrider
-    10873, -- Red Mechanostrider
-    17462, -- Red Skeletal Horse
-    22722, -- Red Skeletal Warhorse
-    16080, -- Red Wolf
     23254, -- Redeeming the Soul
     20773, -- Redemption
     22430, -- Refined Scale of Onyxia
@@ -761,8 +711,6 @@ local castSpellIDs = {
     5161, -- Revive Dig Rat
     982, -- Revive Pet
     15591, -- Revive Ringo
-    18363, -- Riding Kodo
-    30174, -- Riding Turtle
     9614, -- Rift Beacon
     27738, -- Right Piece of Lord Valthalak's Amulet
     461, -- Righteous Flame On
@@ -850,9 +798,7 @@ local castSpellIDs = {
     7077, -- Simple Teleport
     7078, -- Simple Teleport Group
     7079, -- Simple Teleport Other
-    8980, -- Skeletal Horse
     6469, -- Skeletal Miner Explode
-    29059, -- Skeletal Steed
     11605, -- Slam
     8809, -- Slave Drain
     1090, -- Sleep
@@ -894,12 +840,9 @@ local castSpellIDs = {
     8016, -- Spirit Decay
     17680, -- Spirit Spawn-out
     3477, -- Spirit Steal
-    10789, -- Spotted Frostsaber
-    10792, -- Spotted Panther
     17155, -- Sprinkling Purified Water
     3975, -- Standard Scope
     25298, -- Starfire
-    15781, -- Steel Mechanostrider
     10254, -- Stone Dwarf Awaken Visual
     28995, -- Stoneskin
     5265, -- Stonesplinter Trogg Disguise
@@ -909,8 +852,6 @@ local castSpellIDs = {
     4539, -- Strength of the Ages
     26181, -- Strike
     24245, -- String Together Heads
-    8394, -- Striped Frostsaber
-    10793, -- Striped Nightsaber
     16741, -- Stronghold Gauntlets
     7355, -- Stuck
     16497, -- Stun Bomb
@@ -928,12 +869,10 @@ local castSpellIDs = {
     10696, -- Summon Azure Whelpling
     25849, -- Summon Baby Shark
     10714, -- Summon Black Kingsnake
-    26656, -- Summon Black Qiraji Battle Tank
     15794, -- Summon Blackhand Dreadweaver
     15792, -- Summon Blackhand Veteran
     17567, -- Summon Blood Parrot
     13463, -- Summon Bloodpetal Mini Pests
-    25953, -- Summon Blue Qiraji Battle Tank
     10715, -- Summon Blue Racer
     8286, -- Summon Boar Spirit
     15048, -- Summon Bomb
@@ -974,7 +913,6 @@ local castSpellIDs = {
     19561, -- Summon Gnashjaw
     13258, -- Summon Goblin Bomb
     10707, -- Summon Great Horned Owl
-    26056, -- Summon Green Qiraji Battle Tank
     10718, -- Summon Green Water Snake
     10683, -- Summon Green Wing Macaw
     7762, -- Summon Gunther's Visage
@@ -1021,7 +959,6 @@ local castSpellIDs = {
     10709, -- Summon Prairie Dog
     19774, -- Summon Ragnaros
     13143, -- Summon Razelikh
-    26054, -- Summon Red Qiraji Battle Tank
     3605, -- Summon Remote-Controlled Golem
     10719, -- Summon Ribbon Snake
     3363, -- Summon Riding Gryphon
@@ -1079,7 +1016,6 @@ local castSpellIDs = {
     10703, -- Summon Wood Frog
     15999, -- Summon Worg Pup
     23152, -- Summon Xorothian Dreadsteed
-    26055, -- Summon Yellow Qiraji Battle Tank
     17709, -- Summon Zergling
     16590, -- Summon Zombie
     16473, -- Summoned Urok
@@ -1087,27 +1023,6 @@ local castSpellIDs = {
     15869, -- Superior Healing Ward
     26103, -- Sweep
     27722, -- Sweet Surprise
-    23241, -- Swift Blue Raptor
-    23238, -- Swift Brown Ram
-    23229, -- Swift Brown Steed
-    23250, -- Swift Brown Wolf
-    23220, -- Swift Dawnsaber
-    23221, -- Swift Frostsaber
-    23239, -- Swift Gray Ram
-    23252, -- Swift Gray Wolf
-    23225, -- Swift Green Mechanostrider
-    23219, -- Swift Mistsaber
-    23242, -- Swift Olive Raptor
-    23243, -- Swift Orange Raptor
-    23227, -- Swift Palomino
-    24242, -- Swift Razzashi Raptor
-    23338, -- Swift Stormsaber
-    23251, -- Swift Timber Wolf
-    23223, -- Swift White Mechanostrider
-    23240, -- Swift White Ram
-    23228, -- Swift White Steed
-    23222, -- Swift Yellow Mechanostrider
-    24252, -- Swift Zulian Tiger
     8593, -- Symbol of Life
     24160, -- Syncretist's Sigil
     3718, -- Syndicate Bomb
@@ -1116,9 +1031,7 @@ local castSpellIDs = {
     17161, -- Taking Moon Well Sample
     9795, -- Talvash's Necklace Repair
     20041, -- Tammra Sapling
-    16059, -- Tawny Sabercat
     2817, -- Teach Bark of Doom
-    18992, -- Teal Kodo
     12521, -- Teleport from Azshara Tower
     12509, -- Teleport to Azshara Tower
     3565, -- Teleport: Darnassus
@@ -1147,7 +1060,6 @@ local castSpellIDs = {
     25004, -- Throw Nightmare Object
     4164, -- Throw Rock
     4165, -- Throw Rock II
-    10790, -- Tiger
     23312, -- Time Lapse
     25158, -- Time Stop
     6470, -- Tiny Bronze Key
@@ -1173,14 +1085,12 @@ local castSpellIDs = {
     785, -- True Fulfillment
     10348, -- Tune Up
     10326, -- Turn Undead
-    10796, -- Turquoise Raptor
     10340, -- Uldaman Boss Agro
     9577, -- Uldaman Key Staff
     11568, -- Uldaman Sub-Boss Agro
     20006, -- Unholy Curse
     3670, -- Unlock Maury's Foot
     10738, -- Unlocking
-    17454, -- Unpainted Mechanostrider
     24024, -- Unstable Concoction
     16562, -- Urok Minions Vanish
     19719, -- Use Bauble
@@ -1190,7 +1100,6 @@ local castSpellIDs = {
     6354, -- Venom's Bane
     27721, -- Very Berry Cream
     18115, -- Viewing Room Student Transform - Effect
-    10799, -- Violet Raptor
     17529, -- Vitreous Focuser
     24163, -- Vodouisant's Vigilant Embrace
     21066, -- Void Bolt
@@ -1212,18 +1121,13 @@ local castSpellIDs = {
     7220, -- Weapon Chain
     7218, -- Weapon Counterweight
     11410, -- Whirling Barrage
-    15779, -- White Mechanostrider
-    6898, -- White Ram
-    468, -- White Stallion
     16724, -- Whitesoul Helm
     4520, -- Wide Sweep
     28732, -- Widow's Embrace
     9616, -- Wild Regeneration
     16598, -- Will of Shahram
     23339, -- Wing Buffet
-    581, -- Winter Wolf
     21736, -- Winterax Wisdom
-    17229, -- Winterspring Frostsaber
     22662, -- Wither
     4974, -- Wither Touch
     25121, -- Wizard Oil
@@ -1238,13 +1142,14 @@ local castSpellIDs = {
     24422, -- Zandalar Signet of Might
     24421, -- Zandalar Signet of Mojo
     24420, -- Zandalar Signet of Serenity
+    10181, -- Frostbolt (needs to be last for chinese clients, see issue #16)
 }
 
 local counter, cursor = 0, 1
 local castedSpells = {}
 namespace.castedSpells = castedSpells
 
--- temporary, ill clean up this later
+-- TODO: cleanup
 local function BuildSpellNameToSpellIDTable()
     counter = 0
 
@@ -1281,15 +1186,24 @@ namespace.channeledSpells = {
     [GetSpellInfo(13278)] = { 4, 13278 },     -- Gnomish Death Ray
     [GetSpellInfo(20577)] = { 10, 20577 },    -- Cannibalize
     [GetSpellInfo(10797)] = { 6, 10797 },     -- Starshards
+    [GetSpellInfo(16430)] = { 12, 16430 },    -- Soul Tap
+    [GetSpellInfo(24323)] = { 8, 24323 },     -- Blood Siphon
+    [GetSpellInfo(27640)] = { 3, 27640 },     -- Baron Rivendare's Soul Drain
+    [GetSpellInfo(7290)] = { 10, 7290 },      -- Soul Siphon
+    [GetSpellInfo(24322)] = { 8, 24322 },     -- Blood Siphon
+    [GetSpellInfo(27177)] = { 10, 27177 },    -- Defile
+    [GetSpellInfo(16045)] = { 30, 16045 },    -- Encage
 
     -- DRUID
     [GetSpellInfo(17401)] = { 10, 17401 },   -- Hurricane
     [GetSpellInfo(740)] = { 10, 740 },       -- Tranquility
+    [GetSpellInfo(20687)] = { 10, 20687 },   -- Starfall
 
     -- HUNTER
     [GetSpellInfo(6197)] = { 60, 6197 },      -- Eagle Eye
     [GetSpellInfo(1002)] = { 60, 1002 },      -- Eyes of the Beast
     [GetSpellInfo(1510)] = { 6, 1510 },       -- Volley
+    [GetSpellInfo(136)] = { 5, 136 },         -- Mend Pet
 
     -- MAGE
     [GetSpellInfo(5143)] = { 5, 5143, },       -- Arcane Missiles
@@ -1446,7 +1360,7 @@ namespace.crowdControls = {
 
 -- Addon Savedvariables
 namespace.defaultConfig = {
-    version = "12", -- settings version
+    version = "14", -- settings version
     pushbackDetect = true,
     movementDetect = true,
     locale = GetLocale(),
@@ -1458,6 +1372,7 @@ namespace.defaultConfig = {
         iconSize = 13,
         showCastInfoOnly = false,
         showTimer = false,
+        showIcon = true,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 8,
@@ -1484,6 +1399,7 @@ namespace.defaultConfig = {
         iconSize = 16,
         showCastInfoOnly = false,
         showTimer = false,
+        showIcon = true,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 10,
@@ -1510,6 +1426,7 @@ namespace.defaultConfig = {
         iconSize = 16,
         showCastInfoOnly = false,
         showTimer = false,
+        showIcon = true,
         autoPosition = false,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 9,
@@ -1531,19 +1448,20 @@ namespace.defaultConfig = {
 
     player = {
         enabled = false,
-        width = 190,
-        height = 19,
-        iconSize = 16,
+        width = 195,
+        height = 20,
+        iconSize = 22,
         showCastInfoOnly = false,
         showTimer = false,
+        showIcon = true,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 12,
-        castStatusBar = "Interface\\TargetingFrame\\UI-StatusBar",
+        castStatusBar = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
         castBorder = "Interface\\CastingBar\\UI-CastingBar-Border",
         hideIconBorder = false,
         position = { "CENTER", -18, -87 },
-        iconPositionX = -5,
+        iconPositionX = -10,
         iconPositionY = 0,
         borderColor = { 1, 1, 1, 1 },
         statusColor = { 1, 0.7, 0, 1 },

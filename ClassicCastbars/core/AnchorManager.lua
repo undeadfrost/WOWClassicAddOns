@@ -59,7 +59,15 @@ local function GetUnitFrameForUnit(unitType, unitID, hasNumberIndex)
             name = format(name, strmatch(unitID, "%d+")) -- add unit index to unitframe name
         end
 
-        if _G[name] then return _G[name], name end
+        local frame = _G[name]
+        if frame then
+            if unitType == "party" then
+                return _G[name], name
+            end
+            if frame:IsVisible() then
+                return _G[name], name
+            end
+        end
     end
 end
 
@@ -77,7 +85,7 @@ local function GetPartyFrameForUnit(unitID)
     -- to loop through them all and check if the unit matches
     for i = 1, 40 do
         local frame, frameName = GetUnitFrameForUnit("party", "party"..i, true)
-        if frame and frame.unit and UnitGUID(frame.unit) == guid then
+        if frame and frame.unit and UnitGUID(frame.unit) == guid and frame:IsVisible() then
             if compact then
                 if strfind(frameName, "PartyMemberFrame") == nil then
                     return frame
