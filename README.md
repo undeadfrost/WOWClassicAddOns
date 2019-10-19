@@ -35,3 +35,5 @@
 > Quartz 施法条延迟 v3.5.2
 
 > Leatrix_Plus 小工具 v1.13.35
+
+> OmniCC 冷却时间 v8.2.5
