@@ -86,65 +86,23 @@ local function CSC_PaperDollFormatStat(name, base, posBuff, negBuff)
     return effective, text;
 end
 
--- returns additional crit % stats from Arcane instability and Critical Mass if any
-local function CSC_GetMageCritStatsFromTalents()
-
-	local arcaneInstabilityCrit = 0;
-	local criticalMassCrit = 0;
-
-	-- Arcane Instability (1, 2, 3)%
-	local arcaneInstabilityTable = { 1, 2, 3 };
-	local spellRank = select(5, GetTalentInfo(1, 15));
-	if (spellRank > 0) and (spellRank <= 3) then
-		arcaneInstabilityCrit = arcaneInstabilityTable[spellRank];
+local function CSC_GetMP5FromGear(unit)
+	local mp5 = 0;
+	for i=1,18 do
+		local itemLink = GetInventoryItemLink(unit, i);
+		if itemLink then
+			local stats = GetItemStats(itemLink);
+			if stats then
+				-- For some reason this returns (mp5 - 1) so I have to add 1 to the result
+				local statMP5 = stats["ITEM_MOD_POWER_REGEN0_SHORT"];
+				if (statMP5) then
+					mp5 = mp5 + statMP5 + 1;
+				end
+			end
+		end
 	end
 
-	-- Critical Mass (2, 4, 6)%
-	local criticalMassTable = { 2, 4, 6 };
-	spellRank = select(5, GetTalentInfo(2, 13));
-	if (spellRank > 0) and (spellRank <= 3) then
-		criticalMassCrit = criticalMassTable[spellRank];
-	end
-
-	return arcaneInstabilityCrit, criticalMassCrit;
-end
-
--- returns the combined crit stats from Holy Specialization and Force of Will
-local function CSC_GetPriestCritStatsFromTalents()
-	
-	local holySpecializationCrit = 0;
-	local forceOfWillCrit = 0;
-
-	local critTable = { 1, 2, 3, 4, 5 };
-	-- Holy Specialization (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(2, 3));
-	if (spellRank > 0) and (spellRank <= 5) then
-		holySpecializationCrit = critTable[spellRank];
-	end
-
-	-- Force of Will (1, 2, 3, 4, 5)%
-	spellRank = select(5, GetTalentInfo(1, 14));
-	if (spellRank > 0) and (spellRank <= 5) then
-		forceOfWillCrit = critTable[spellRank];
-	end
-
-	local critCombined = holySpecializationCrit + forceOfWillCrit;
-	return critCombined;
-end
-
--- returns the crit bonus from Holy Power
-local function CSC_GetPaladinCritStatsFromTalents()
-
-	local holyPowerCrit = 0;
-	local critTable = { 1, 2, 3, 4, 5 };
-
-	-- Holy Power (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(1, 13));
-	if (spellRank > 0) and (spellRank <= 5) then
-		holyPowerCrit = critTable[spellRank];
-	end
-
-	return holyPowerCrit;
+	return mp5;
 end
 -- GENERAL UTIL FUNCTIONS END --
 
@@ -587,13 +545,19 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 
 	local numSkills = GetNumSkillLines();
 	local skillIndex = 0;
+	local currentHeader = nil;
 
 	for i = 1, numSkills do
 		local skillName = select(1, GetSkillLineInfo(i));
+		local isHeader = select(2, GetSkillLineInfo(i));
 
-		if (skillName == DEFENSE) then
-			skillIndex = i;
-			break;
+		if isHeader ~= nil and isHeader then
+			currentHeader = skillName;
+		else
+			if (currentHeader == CSC_WEAPON_SKILLS_HEADER and skillName == CSC_DEFENSE) then
+				skillIndex = i;
+				break;
+			end
 		end
 	end
 
@@ -615,7 +579,7 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	end
 	local valueText, tooltipText = CSC_PaperDollFormatStat(DEFENSE_COLON, skillRank, posBuff, negBuff);
 	local valueNum = max(0, skillRank + posBuff + negBuff);
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, DEFENSE, valueText, false, valueNum);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, CSC_DEFENSE, valueText, false, valueNum);
 	statFrame.tooltip = tooltipText;
 	tooltipText = format(DEFAULT_STATDEFENSE_TOOLTIP, valueNum, 0, valueNum*0.04, valueNum*0.04);
 	tooltipText = tooltipText:gsub('.-\n', '', 1);
@@ -724,18 +688,25 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 		return;
 	end
 
+	statFrame:SetScript("OnEnter", CSC_CharacterManaRegenFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+    end)
+
+	-- There is a bug in GetManaRegen() so I have to manually calculate mp5
 	local base, combat = GetManaRegen();
+	local mp5 = CSC_GetMP5FromGear(unit);
 	
 	-- All mana regen stats are displayed as mana/5 sec.
-	base = floor(base * 5.0);
-	combat = floor(combat * 5.0);
+	base = floor(base * 5.0) + mp5;
+	combat = mp5; --floor(combat * 5.0);
+
 	local baseText = BreakUpLargeNumbers(base);
 	local combatText = BreakUpLargeNumbers(combat);
 	-- Combat mana regen is most important to the player, so we display it as the main value
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, combatText, false, combat);
-	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, MANA_REGEN) .. " " .. combatText;
-	-- Base (out of combat) regen is displayed only in the subtext of the tooltip
-	statFrame.tooltip2 = format(MANA_REGEN_TOOLTIP, baseText);
+	statFrame.mp5Casting = combatText;
+	statFrame.mp5NotCasting = baseText;
 	statFrame:Show();
 end
 
@@ -792,6 +763,16 @@ function CSC_CharacterSpellCritFrame_OnEnter(self)
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL6_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.arcaneCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL5_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.shadowCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL3_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.natureCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:Show();
+end
+
+function CSC_CharacterManaRegenFrame_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(MANA_REGEN_TOOLTIP, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine("!!! Currently detects MP5 from gear only !!!", "", 1, 0, 0);
+	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Casting):", self.mp5Casting);
+	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Not Casting):", self.mp5NotCasting);
 	GameTooltip:Show();
 end
 -- OnEnter Tooltip functions END

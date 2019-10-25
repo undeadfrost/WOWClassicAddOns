@@ -1,26 +1,26 @@
 ## 介绍
 
-> ClassicCastbars 读条显示 v1.1.1
+> ClassicCastbars 读条显示 v1.1.2
 
-> Leatrix Maps 地图增强 v1.13.2 /ltm打开设置
+> Leatrix Maps 地图增强 v1.13.36 /ltm打开设置
 
-> Quesite 任务 v4.1.2
+> Quesite 任务 v5.0.1_2-e2e80b7
 
-> Bagnon 背包 v8.2.15
+> Bagnon 背包 v8.2.16
 
-> AtlasLootClassic 副本掉落 v1.2.0
+> AtlasLootClassic 副本掉落 v1.3.2
 
 > AtlasLootClassic_Maps 副本地图 v1.0.0 (依赖AtlasLootClassic)
 
 > Recount 伤害统计 v8.2.5a
 
-> VendorPrice 物品价格显示 v1.2.8
+> VendorPrice 物品价格显示 v1.2.9
 
 > RealMobHealth 血量模拟 v2.13
 
 > QuestGuru 任务面板增强 v2.1.7
 
-> ClassicAuraDurations 目标buff debuff显示 v1.13.32
+> ClassicAuraDurations 目标buff debuff显示 v1.13.40
 
 > oGlow 装备染色 v2.2.8
 
@@ -28,12 +28,12 @@
 
 > ClassicAutoDismount 自动下马 v1.01
 
-> Fizzle 装备耐久度 v80200-4
+> Fizzle 装备耐久度 v80205
 
-> CharacterStatsClassic 角色属性详情 v1.9.1
+> CharacterStatsClassic 角色属性详情 v2.4.1
 
 > Quartz 施法条延迟 v3.5.2
 
-> Leatrix_Plus 小工具 v1.13.35
+> Leatrix_Plus 小工具 v1.13.36
 
 > OmniCC 冷却时间 v8.2.5
