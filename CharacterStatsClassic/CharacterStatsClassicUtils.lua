@@ -449,6 +449,25 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	statFrame:Show();
 end
 
+local function CSC_GetHitFromBiznicksAccurascope(unit)
+	CSC_ScanTooltip:ClearLines();
+
+	local hitFromScope = 0;
+	local rangedIndex = 18;
+
+	local itemLink = GetInventoryItemLink(unit, rangedIndex);
+	if itemLink then
+		local itemId, enchantId = itemLink:match("item:(%d+):(%d*)");
+		if enchantId then
+			if tonumber(enchantId) == 2523 then
+				hitFromScope = hitFromScope + 3;
+			end
+		end
+	end
+
+	return hitFromScope;
+end
+
 function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 	
 	if not IsRangedWeapon() then
@@ -461,6 +480,11 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 	
 	if not hitChance then
 		hitChance = 0;
+	end
+
+	local hitFromScope = CSC_GetHitFromBiznicksAccurascope(unit);
+	if (hitFromScope > 0) then
+		hitChance = hitChance + hitFromScope;
 	end
 
 	local hitChanceText = hitChance;
@@ -627,6 +651,7 @@ local function CSC_GetBlockValue(unit)
 						local numValue = tonumber(valueTxt);
 						if numValue then
 							blockFromShield = numValue;
+							break;
 						end
 					end
 				end
