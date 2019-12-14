@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- 	Leatrix Plus 1.13.38 (20th November 2019)
+-- 	Leatrix Plus 1.13.40 (11th December 2019)
 ----------------------------------------------------------------------
 
 --	01:Functions	20:Live			50:RunOnce		70:Logout			
@@ -20,7 +20,7 @@
 	local void
 
 --	Version
-	LeaPlusLC["AddonVer"] = "1.13.38"
+	LeaPlusLC["AddonVer"] = "1.13.40"
 	LeaPlusLC["RestartReq"] = nil
 
 --	If client restart is required and has not been done, show warning and quit
@@ -3040,7 +3040,7 @@
 
 			-- Add map button
 			local logMapButton = CreateFrame("Button", nil, QuestLogFrame, "UIPanelButtonTemplate")
-			logMapButton:SetText("Map")
+			logMapButton:SetText(L["Map"])
 			logMapButton:ClearAllPoints()
 			logMapButton:SetPoint("LEFT", QuestFramePushQuestButton, "RIGHT", -3, 0)
 			logMapButton:SetSize(100, 21)
@@ -3094,7 +3094,7 @@
 								elseif suggestedGroup == ELITE then levelSuffix = "+"
 								end
 							end
-							local questTextFormatted = string.format("  [%d" .. levelSuffix  .. "] %s", level, title)
+							local questTextFormatted = string.format("  [%d" .. L[levelSuffix] .. "] %s", level, title)
 							questLogTitle:SetText(questTextFormatted)
 							QuestLogDummyText:SetText(questTextFormatted)
 						end
