@@ -40,10 +40,6 @@
 
 > Deadly Boss Mods DBM v1.13.24
 
-> Parrot 浮动战斗文字增强 v2.1
-
-> UnitFramesPlusClassic 头像增强 v1.32
-
 > Capping 战场事件计时 v2
 
 > ClassicThreatMeter 仇恨统计插件 v1.10
