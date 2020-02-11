@@ -49,13 +49,14 @@ local function CreateUnitTabGroup(unitID, localizedUnit, order)
 
                 args = {
                     -- keys here has to match savedvariables key
-                    -- Or else you have to set a new 'get' and 'set' func
+                    -- or else you have to set a new 'get' and 'set' func
                     enabled = {
                         order = 1,
                         name = L.TOGGLE_CASTBAR,
                         desc = L.TOGGLE_CASTBAR_TOOLTIP,
                         width = "full", -- these have to be full to not truncate text in non-english locales
                         type = "toggle",
+                        hidden = unitID == "focus",
                         confirm = function()
                             return unitID == "player" and ClassicCastbarsDB[unitID].enabled and L.REQUIRES_RESTART or false
                         end,
@@ -64,7 +65,7 @@ local function CreateUnitTabGroup(unitID, localizedUnit, order)
                             ClassicCastbars:ToggleUnitEvents(true)
                             if unitID == "player" then
                                 if value == false then
-                                    ReloadUI()
+                                    return ReloadUI()
                                 end
                                 ClassicCastbars:SkinPlayerCastbar()
                             end
@@ -76,7 +77,7 @@ local function CreateUnitTabGroup(unitID, localizedUnit, order)
                         name = L.AUTO_POS_BAR,
                         desc = unitID ~= "player" and L.AUTO_POS_BAR_TOOLTIP or "",
                         type = "toggle",
-                        hidden = unitID == "nameplate" or unitID == "party",
+                        hidden = unitID == "nameplate" or unitID == "party" or unitID == "focus",
                         disabled = ModuleIsDisabled,
                     },
                     showTimer = {
@@ -119,8 +120,14 @@ local function CreateUnitTabGroup(unitID, localizedUnit, order)
                             ClassicCastbarsDB.movementDetect = value
                         end,
                         get = function() return ClassicCastbarsDB.movementDetect end,
-                        hidden = unitID == "player",
+                        hidden = unitID == "player" or unitID == "focus",
                         disabled = ModuleIsDisabled,
+                    },
+                    notes = {
+                        order = 8,
+                        hidden = unitID ~= "focus",
+                        name = "\n|cffffff00 - /focus\n\n - /clearfocus\n\n - /click FocusCastbar|r\n\n Note that focus castbar is experimental and also work in progress.",
+                        type = "description",
                     },
                 },
             },
@@ -409,6 +416,7 @@ local function GetOptionsTable()
             nameplate = CreateUnitTabGroup("nameplate", L.NAMEPLATE, 2),
             party = CreateUnitTabGroup("party", L.PARTY, 3),
             player = CreateUnitTabGroup("player", L.PLAYER, 4),
+            focus = CreateUnitTabGroup("focus", _G.FOCUS or "Focus", 5),
 
             resetAllSettings = {
                 order = 3,
@@ -424,6 +432,7 @@ local function GetOptionsTable()
                     ClassicCastbars_TestMode:OnOptionChanged("nameplate")
                     ClassicCastbars_TestMode:OnOptionChanged("party")
                     ClassicCastbars_TestMode:OnOptionChanged("player")
+                    ClassicCastbars_TestMode:OnOptionChanged("focus")
 
                     if shouldReloadUI then
                         ReloadUI()

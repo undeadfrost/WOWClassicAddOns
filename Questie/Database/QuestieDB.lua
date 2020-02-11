@@ -219,6 +219,13 @@ function QuestieDB:GetQuest(questID) -- /dump QuestieDB:GetQuest(867)
         QO.Repeatable = mod(QO.specialFlags, 2) == 1
     end
 
+    local questType, questTag = GetQuestTagInfo(questID)
+    if questType == 81 then
+        QO.isDungeonQuest = true
+    elseif questType == 41 then
+        QO.isPvPQuest = true
+    end
+
     -- reorganize to match wow api
     if rawdata[3][1] ~= nil then
         for k,v in pairs(rawdata[3][1]) do
@@ -332,7 +339,7 @@ function QuestieDB:GetQuest(questID) -- /dump QuestieDB:GetQuest(867)
     local hidden = rawdata[21]
 
     if hidden ~= nil then --required source items
-        for _,Id in pairs(hidden) do
+        for _, Id in pairs(hidden) do
             if Id ~= nil then
 
                 local obj = {};
@@ -360,6 +367,7 @@ function QuestieDB:GetQuest(questID) -- /dump QuestieDB:GetQuest(867)
     end
 
     --- function
+    ---@return boolean @Returns true if the quest should be grey, false otherwise
     function QO:IsTrivial()
         local levelDiff = self.level - QuestiePlayer:GetPlayerLevel();
         if (levelDiff >= 5) then
@@ -375,8 +383,98 @@ function QuestieDB:GetQuest(questID) -- /dump QuestieDB:GetQuest(867)
         end
     end
 
+    ---@return boolean @Returns true if any pre quest has been completed or none is listed, false otherwise
+    function QO:IsPreQuestSingleFulfilled()
+        local preQuestSingle = self.preQuestSingle
+        if not preQuestSingle or not next(preQuestSingle) then
+            return true
+        end
+        for _, preQuestId in pairs(preQuestSingle) do
+            local preQuest = QuestieDB:GetQuest(preQuestId);
+
+            -- If a quest is complete the requirement is fulfilled
+            if Questie.db.char.complete[preQuestId] then
+                return true
+            -- If one of the quests in the exclusive group is complete the requirement is fulfilled
+            elseif preQuest and preQuest.ExclusiveQuestGroup then
+                for _, v in pairs(preQuest.ExclusiveQuestGroup) do
+                    if Questie.db.char.complete[v] then
+                        return true
+                    end
+                end
+            end
+        end
+        -- No preQuest is complete
+        return false
+    end
+
+    ---@return boolean @Returns true if all listed pre quests are complete or none is listed, false otherwise
+    function QO:IsPreQuestGroupFulfilled()
+        local preQuestGroup = self.preQuestGroup
+        if not preQuestGroup  or not next(preQuestGroup) then
+            return true
+        end
+        for _, preQuestId in pairs(preQuestGroup) do
+            -- If a quest is not complete and no exlusive quest is complete, the requirement is not fulfilled
+            if not Questie.db.char.complete[preQuestId] then
+                local preQuest = QuestieDB:GetQuest(preQuestId);
+                if preQuest == nil or preQuest.ExclusiveQuestGroup == nil then
+                    return false
+                end
+
+                local anyExlusiveFinished = false
+                for _, v in pairs(preQuest.ExclusiveQuestGroup) do
+                    if Questie.db.char.complete[v] then
+                        anyExlusiveFinished = true
+                    end
+                end
+                if not anyExlusiveFinished then
+                    return false
+                end
+            end
+        end
+        -- All preQuests are complete
+        return true
+    end
+
     QuestieDB._QuestCache[questID] = QO
     return QO
+end
+
+---@param quest Quest
+---@return table<string, table> @List of creature names with their min-max level and rank
+function QuestieDB:GetCreatureLevels(quest)
+    local creatureLevels = {}
+
+    local function _CollectCreatureLevels(npcList)
+        for index, npcId in pairs(npcList) do
+            -- Some objectives are {id, name} others are just {id}
+            if npcId == nil or type(npcId) == "string" then
+                npcId = index
+            end
+            local npc = QuestieDB:GetNPC(npcId)
+            if npc and not creatureLevels[npc.name] then
+                creatureLevels[npc.name] = {npc.minLevel, npc.maxLevel, npc.rank}
+            end
+        end
+    end
+
+    if quest.objectives then
+        if quest.objectives[1] then -- Killing creatures
+            for _, mobObjective in pairs(quest.objectives[1]) do
+                _CollectCreatureLevels(mobObjective)
+            end
+        end
+        if quest.objectives[3] then -- Looting items from creatures
+            for _, itemObjective in pairs(quest.objectives[3]) do
+                local item = QuestieDB:GetItem(itemObjective[1])
+                if item and item.npcDrops then
+                    _CollectCreatureLevels(item.npcDrops)
+                end
+            end
+        end
+    end
+    return creatureLevels
 end
 
 QuestieDB.FactionGroup = UnitFactionGroup("player")
@@ -425,7 +523,7 @@ function QuestieDB:GetNPC(npcID)
         return QuestieDB._NPCCache[npcID]
     end
 
-    local rawdata = QuestieDB.npcData[npcID]    
+    local rawdata = QuestieDB.npcData[npcID]
     if not rawdata then
         Questie:Debug(DEBUG_CRITICAL, "[QuestieDB:GetNPC] rawdata is nil for npcID:", npcID)
         return QuestieDB:_GetSpecialNPC(npcID)

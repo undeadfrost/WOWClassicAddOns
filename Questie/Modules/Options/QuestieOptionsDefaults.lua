@@ -61,8 +61,10 @@ function QuestieOptionsDefaults:Load()
             trackerFontSizeLine = 11,
             hookTracking = true,
             trackerEnabled = true,
+            trackerShowCompleteQuests = true,
             trackerShowQuestLevel = true,
             showBlizzardQuestTimer = false,
+            stickyDurabilityFrame = true,
             trackerColorObjectives = 'white',
             trackerQuestPadding = 2,
             trackerSortObjectives = 'byComplete',
@@ -71,9 +73,6 @@ function QuestieOptionsDefaults:Load()
             trackerbindUntrack = "shiftleft",
             iconFadeLevel = 0.3,
             trackerLocked = true,
-            hideUnexploredMapIcons = false,
-            showRepeatableQuests = true,
-            trackerCounterEnabled = true,
             trackerBackgroundEnabled = false,
         },
         char = {
@@ -86,7 +85,15 @@ function QuestieOptionsDefaults:Load()
             journey = {},
             searchType = 1,
             autoaccept = false,
-            autocomplete = false
+            autocomplete = false,
+            autoModifier = "shift",
+            acceptTrivial = false,
+            isTrackerExpanded = true,
+            hideUnexploredMapIcons = false,
+            showRepeatableQuests = true,
+            showEventQuests = true,
+            showDungeonQuests = true,
+            showPvPQuests = true,
         },
         profile = {minimap = {hide = false}}
     }

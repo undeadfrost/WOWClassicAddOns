@@ -1,3 +1,67 @@
+### 1.13.50
+
+- ToC Update for 1.13.3
+
+### 1.13.49
+
+- DR bugfix
+
+### 1.13.48
+
+- LCD update
+
+### 1.13.46
+
+- Bugfix
+
+### 1.13.45
+
+- Bugfixes
+
+### 1.13.44
+
+- Fixed Shadow Weaving debuff conlicting with Warlock Shadow Vulnerability
+
+### 1.13.43
+
+- LCD Update
+
+### 1.13.42
+
+- Added Winer's Chill, visible if talented
+- LibAuraTypes update, separate aura priorities for enemies and allies
+
+### 1.13.41
+
+- Large Personal Debuffs option, only available with Full Aura Replacement enabled
+
+### 1.13.40
+
+- Many long buffs should show duration now even when not casted player
+- Not resetting timers on Hunter deaths
+
+### 1.13.37
+
+- bugfix for infinite auras
+
+### 1.13.36
+
+- Kidney, Cheap Shot, Scatter DR changes
+- Indefinite duration buffs like Stances and Paladin's Auras now should appear in enemy buffs
+- Mind Blast and Scorch damage no longer refresh Vulnerability if debuff was resisted
+
+### 1.13.35
+
+- Long CC PvP durations set to 20s.
+
+### 1.13.34
+
+- Improved Blizzard timer
+
+### 1.13.33
+
+- Arcane Brilliance duration is 60m now
+
 ### 1.13.32
 
 - Shadow Weaving now refreshes on MF and SWP applications

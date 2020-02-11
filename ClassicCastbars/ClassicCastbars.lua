@@ -8,7 +8,7 @@ addon:SetScript("OnEvent", function(self, event, ...)
 end)
 
 local activeGUIDs = {}
-local activeTimers = {}
+local activeTimers = {} -- active cast data
 local activeFrames = {}
 local npcCastTimeCacheStart = {}
 local npcCastTimeCache = {}
@@ -21,6 +21,7 @@ namespace.addon = addon
 ClassicCastbars = addon -- global ref for ClassicCastbars_Options
 
 -- upvalues for speed
+local strfind = _G.string.find
 local pairs = _G.pairs
 local UnitGUID = _G.UnitGUID
 local UnitAura = _G.UnitAura
@@ -47,6 +48,7 @@ local BLINDING_LIGHT = GetSpellInfo(23733)
 local BERSERKING = GetSpellInfo(20554)
 
 function addon:CheckCastModifier(unitID, cast)
+    if unitID == "focus" then return end
     if not self.db.pushbackDetect or not cast then return end
     if cast.unitGUID == self.PLAYER_GUID then return end -- modifiers already taken into account with CastingInfo()
     if unaffectedCastModsSpells[cast.spellID] then return end
@@ -73,13 +75,21 @@ function addon:CheckCastModifier(unitID, cast)
     end
 
     -- Buffs
-    -- These will only work for friendly units or if Detect Magic is on the unit
-    -- We could detect buffs in the CLEU aswell but this'll have to do for now.
     local _, className = UnitClass(unitID)
     local _, raceFile = UnitRace(unitID)
     if className == "DRUID" or className == "PRIEST" or className == "MAGE" or className == "PALADIN" or raceFile == "Troll" then
+        local libCD = LibStub and LibStub("LibClassicDurations", true)
+        local libCDEnemyBuffs = libCD and libCD.enableEnemyBuffTracking
+
         for i = 1, 32 do
-            local name = UnitAura(unitID, i, "HELPFUL")
+            local name
+            if not libCDEnemyBuffs then
+                name = UnitAura(unitID, i, "HELPFUL")
+            else
+                -- if LibClassicDurations happens to be loaded by some other addon, use it
+                -- to get enemy buff data
+                name = libCD.UnitAuraWithBuffs(unitID, i, "HELPFUL")
+            end
             if not name then break end -- no more buffs
 
             if name == BARKSKIN and not cast.hasBarkskinModifier then
@@ -139,7 +149,7 @@ function addon:StopAllCasts(unitGUID, noFadeOut)
     end
 end
 
--- Store new cast data for unit, and start castbar(s)
+-- Store or refresh new cast data for unit, and start castbar(s)
 function addon:StoreCast(unitGUID, spellName, spellID, iconTexturePath, castTime, isPlayer, isChanneled)
     local currTime = GetTime()
 
@@ -157,7 +167,7 @@ function addon:StoreCast(unitGUID, spellName, spellID, iconTexturePath, castTime
     cast.unitGUID = unitGUID
     cast.timeStart = currTime
     cast.isPlayer = isPlayer
-    cast.hasCastSlowModified = nil
+    cast.hasCastSlowModified = nil -- just nil previous values to avoid overhead of wiping table
     cast.hasBarkskinModifier = nil
     cast.hasNaturesGraceModifier = nil
     cast.hasFocusedCastingModifier = nil
@@ -197,8 +207,6 @@ function addon:CastPushback(unitGUID)
 
     if not cast.isChanneled then
         -- https://wow.gamepedia.com/index.php?title=Interrupt&oldid=305918
-        -- On level 1 it seems like the pushback value starts at 0.5 but at
-        -- higher lvl it is 1.0s. This needs some more testing.
         cast.pushbackValue = cast.pushbackValue or 1.0
         cast.maxValue = cast.maxValue + cast.pushbackValue
         cast.endTime = cast.endTime + cast.pushbackValue
@@ -207,6 +215,30 @@ function addon:CastPushback(unitGUID)
         -- channels are reduced by 25% per hit afaik
         cast.maxValue = cast.maxValue - (cast.maxValue * 25) / 100
         cast.endTime = cast.endTime - (cast.maxValue * 25) / 100
+    end
+end
+
+SLASH_CCFOCUS1 = "/focus"
+SLASH_CCFOCUS2 = "/castbarfocus"
+SlashCmdList["CCFOCUS"] = function(msg)
+    local unitID = msg == "mouseover" and "mouseover" or "target"
+    local tarGUID = UnitGUID(unitID)
+    if tarGUID then
+        activeGUIDs.focus = tarGUID
+        addon:StopCast("focus", true)
+        addon:StartCast(tarGUID, "focus")
+        addon:SetFocusDisplay(UnitName(unitID), unitID)
+    else
+        SlashCmdList["CCFOCUSCLEAR"]()
+    end
+end
+
+SLASH_CCFOCUSCLEAR1 = "/clearfocus"
+SlashCmdList["CCFOCUSCLEAR"] = function()
+    if activeGUIDs.focus then
+        activeGUIDs.focus = nil
+        addon:StopCast("focus", true)
+        addon:SetFocusDisplay(nil)
     end
 end
 
@@ -255,7 +287,7 @@ function addon:ToggleUnitEvents(shouldReset)
     end
 
     if shouldReset then
-        self:PLAYER_ENTERING_WORLD() -- reset all data
+        self:PLAYER_ENTERING_WORLD() -- wipe all data
     end
 end
 
@@ -267,6 +299,7 @@ function addon:PLAYER_ENTERING_WORLD(isInitialLogin)
     wipe(activeTimers)
     wipe(activeFrames)
     PoolManager:GetFramePool():ReleaseAll() -- also wipes castbar._data
+    self:SetFocusDisplay(nil)
 
     if self.db.party.enabled and IsInGroup() then
         self:GROUP_ROSTER_UPDATE()
@@ -348,14 +381,14 @@ function addon:UNIT_AURA()
 end
 
 function addon:UNIT_TARGET(unitID)
+    if not self.db.target.autoPosition then return end
+
     -- reanchor castbar when target of target is cleared or shown
-    if self.db.target.autoPosition then
-        if unitID == "target" or unitID == "player" then
-            if activeFrames.target and activeGUIDs.target then
-                local parentFrame = self.AnchorManager:GetAnchor("target")
-                if parentFrame then
-                    self:SetTargetCastbarPosition(activeFrames.target, parentFrame)
-                end
+    if unitID == "target" or unitID == "player" then
+        if activeFrames.target and activeGUIDs.target then
+            local parentFrame = self.AnchorManager:GetAnchor("target")
+            if parentFrame then
+                self:SetTargetCastbarPosition(activeFrames.target, parentFrame)
             end
         end
     end
@@ -405,6 +438,7 @@ function addon:GROUP_ROSTER_UPDATE()
 end
 addon.GROUP_JOINED = addon.GROUP_ROSTER_UPDATE
 
+-- Upvalues for combat log events
 local bit_band = _G.bit.band
 local COMBATLOG_OBJECT_CONTROL_PLAYER = _G.COMBATLOG_OBJECT_CONTROL_PLAYER
 local COMBATLOG_OBJECT_TYPE_PLAYER = _G.COMBATLOG_OBJECT_TYPE_PLAYER
@@ -430,7 +464,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
 
         if srcGUID ~= self.PLAYER_GUID then
             if isPlayer then
-                -- Use talent reduced cast time for certain player spells
+                -- Use hardcoded talent reduced cast time for certain player spells
                 local reducedTime = castTimeTalentDecreases[spellName]
                 if reducedTime then
                     castTime = reducedTime
@@ -463,14 +497,15 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
             if activeTimers[srcGUID] and GetTime() - activeTimers[srcGUID].timeStart > 0.25 then
                 return self:StopAllCasts(srcGUID)
             end
-            return
+
+            return -- not a cast
         end
 
         local isPlayer = bit_band(srcFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0
 
         -- Auto correct cast times for mobs
         if not isPlayer and not channelCast then
-            if not strfind(srcGUID, "Player-") then -- incase player is mind controlled by NPC
+            if not strfind(srcGUID, "Player-") then -- incase player is mind controlled by an NPC
                 local cachedTime = npcCastTimeCache[srcName .. spellName]
                 if not cachedTime then
                     local cast = activeTimers[srcGUID]
@@ -511,6 +546,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
             -- Aura that interrupts cast was applied
             return self:DeleteCast(dstGUID)
         elseif castTimeIncreases[spellName] and activeTimers[dstGUID] then
+            -- Cast modifiers doesnt modify already active casts, only the next time the player casts
             activeTimers[dstGUID].skipCastSlowModifier = true
         end
     elseif eventType == "SPELL_AURA_REMOVED" then
@@ -544,14 +580,8 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
     end
 end
 
-local castStopBlacklist = {
-    [GetSpellInfo(4068)] = 1,       -- Iron Grenade
-    [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
-    [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
-    [GetSpellInfo(6405)] = 1,       -- Furgbolg Form
-}
-
 local refresh = 0
+local castStopBlacklist = namespace.castStopBlacklist
 addon:SetScript("OnUpdate", function(self, elapsed)
     if not next(activeTimers) then return end
     local currTime = GetTime()
@@ -564,12 +594,14 @@ addon:SetScript("OnUpdate", function(self, elapsed)
         if refresh < 0 then
             if next(activeGUIDs) then
                 for unitID, unitGUID in pairs(activeGUIDs) do
-                    local cast = activeTimers[unitGUID]
-                    -- Only stop cast for players since some mobs runs while casting, also because
-                    -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
-                    if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
-                        if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
-                            self:DeleteCast(unitGUID)
+                    if unitID ~= "focus" then
+                        local cast = activeTimers[unitGUID]
+                        -- Only stop cast for players since some mobs runs while casting, also because
+                        -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
+                        if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
+                            if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
+                                self:DeleteCast(unitGUID)
+                            end
                         end
                     end
                 end
@@ -603,9 +635,10 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                     castbar.Spark:SetPoint("CENTER", castbar, "LEFT", sparkPosition, 0)
                 end
             else
+                -- Delete cast incase stop event wasn't detected in CLEU
                 if castTime <= -0.25 then -- wait atleast 0.25s before deleting incase CLEU stop event is happening at same time
-                    -- Delete cast incase stop event wasn't detected in CLEU
-                    self:DeleteCast(cast.unitGUID, false, true, false, true)
+                    local skipFade = ((currTime - cast.timeStart) > cast.maxValue + 0.25)
+                    self:DeleteCast(cast.unitGUID, false, true, false, skipFade)
                 end
             end
         end

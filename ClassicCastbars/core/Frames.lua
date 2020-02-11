@@ -11,6 +11,7 @@ local min = _G.math.min
 local max = _G.math.max
 local ceil = _G.math.ceil
 local UnitExists = _G.UnitExists
+local InCombatLockdown = _G.InCombatLockdown
 
 function addon:GetCastbarFrame(unitID)
     -- PoolManager:DebugInfo()
@@ -172,11 +173,16 @@ function addon:DisplayCastbar(castbar, unitID)
         db = self.db.party
     end
 
-    if castbar.fadeInfo then
-        -- need to remove frame if it's currently fading so alpha doesn't get changed after re-displaying castbar
-        namespace:UIFrameFadeRemoveFrame(castbar)
-        castbar.fadeInfo.finishedFunc = nil
+    if not castbar.animationGroup then
+        castbar.animationGroup = castbar:CreateAnimationGroup()
+        castbar.animationGroup:SetToFinalAlpha(true)
+        castbar.fade = castbar.animationGroup:CreateAnimation("Alpha")
+        castbar.fade:SetOrder(1)
+        castbar.fade:SetFromAlpha(1)
+        castbar.fade:SetToAlpha(0)
+        castbar.fade:SetSmoothing("OUT")
     end
+    castbar.animationGroup:Stop()
 
     if not castbar.Background then
         castbar.Background = GetStatusBarBackgroundTexture(castbar)
@@ -251,8 +257,9 @@ function addon:HideCastbar(castbar, noFadeOut)
         end
     end
 
-    if castbar:GetAlpha() > 0 then
-        namespace:UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
+    if castbar:GetAlpha() > 0 and castbar.fade then
+        castbar.fade:SetDuration(cast and cast.isInterrupted and 1.5 or 0.3)
+        castbar.animationGroup:Play()
     end
 end
 
@@ -295,11 +302,11 @@ function addon:SkinPlayerCastbar()
     end
 
     if db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border" or db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then
+        CastingBarFrame.Flash:SetTexture("Interface\\CastingBar\\UI-CastingBar-Flash")
         CastingBarFrame.Flash:SetSize(db.width + 61, db.height + 51)
         CastingBarFrame.Flash:SetPoint("TOP", 0, 26)
     else
-        -- TODO: no longer works?
-        CastingBarFrame.Flash:SetSize(0.01, 0.01) -- hide it using size, SetAlpha() or Hide() wont work without messing with blizz code
+        CastingBarFrame.Flash:SetTexture(nil) -- hide it by deleting texture, SetAlpha() or Hide() wont work without messing with blizz code
     end
 
     CastingBarFrame_SetStartCastColor(CastingBarFrame, unpack(db.statusColor))
@@ -337,4 +344,104 @@ function addon:SkinPlayerCastbar()
 
     self:SetCastbarStyle(CastingBarFrame, nil, db)
     self:SetCastbarFonts(CastingBarFrame, nil, db)
+end
+
+function addon:CreateOrUpdateSecureFocusButton(text)
+    if not self.FocusButton then
+        -- Create an invisible secure click trigger above the nonsecure castbar frame
+        self.FocusButton = CreateFrame("Button", "FocusCastbar", UIParent, "SecureActionButtonTemplate")
+        self.FocusButton:SetAttribute("type", "macro")
+        --self.FocusButton:SetAllPoints(self.FocusFrame)
+        --self.FocusButton:SetSize(ClassicCastbarsDB.focus.width + 5, ClassicCastbarsDB.focus.height + 35)
+    end
+
+    local db = ClassicCastbarsDB.focus
+    self.FocusButton:SetPoint(db.position[1], UIParent, db.position[2], db.position[3] + 30)
+    self.FocusButton:SetSize(db.width + 5, db.height + 35)
+
+    self.FocusButton:SetAttribute("macrotext", "/targetexact " .. text)
+    self.FocusFrame.Text:SetText(text)
+end
+
+local NewTimer = _G.C_Timer.NewTimer
+local focusTargetTimer
+local focusTargetResetTimer
+
+function addon:SetFocusDisplay(text, unitID)
+    if focusTargetTimer and not focusTargetTimer:IsCancelled() then
+        focusTargetTimer:Cancel()
+        focusTargetTimer = nil
+    end
+    if focusTargetResetTimer and not focusTargetResetTimer:IsCancelled() then
+        focusTargetResetTimer:Cancel()
+        focusTargetResetTimer = nil
+    end
+
+    if not text then -- clear focus
+        if self.FocusFrame then
+            self.FocusFrame.Text:SetText("")
+        end
+
+        if self.FocusButton then
+            if not InCombatLockdown() then
+                self.FocusButton:SetAttribute("macrotext", "")
+            else
+                -- If we're in combat try to check every 4s if we left combat and can update secure frame
+                local function ClearFocusTarget()
+                    if not InCombatLockdown() then
+                        addon.FocusButton:SetAttribute("macrotext", "")
+                    else
+                        focusTargetResetTimer = NewTimer(4, ClearFocusTarget)
+                    end
+                end
+                focusTargetResetTimer = NewTimer(4, ClearFocusTarget)
+            end
+        end
+
+        return
+    end
+
+    if not self.FocusFrame then
+        -- Create a new unsecure frame to display focus text. We dont reuse the castbar frame as we want to
+        -- display this text even when the castbar is hidden
+        self.FocusFrame = CreateFrame("Frame", nil, UIParent)
+        self.FocusFrame:SetSize(ClassicCastbarsDB.focus.width + 5, ClassicCastbarsDB.focus.height + 35)
+        self.FocusFrame.Text = self.FocusFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLargeOutline")
+        self.FocusFrame.Text:SetPoint("CENTER", self.FocusFrame, 0, 20)
+    end
+
+    if UnitIsPlayer(unitID) then
+        self.FocusFrame.Text:SetTextColor(RAID_CLASS_COLORS[select(2, UnitClass(unitID))]:GetRGBA())
+    else
+        self.FocusFrame.Text:SetTextColor(1, 0.819, 0, 1)
+    end
+
+    local isInCombat = InCombatLockdown()
+    if not isInCombat then
+        self:CreateOrUpdateSecureFocusButton(text)
+    else
+        -- If we're in combat try to check every 4s if we left combat and can update secure frame
+        local function UpdateFocusTarget()
+            if not InCombatLockdown() then
+                addon:CreateOrUpdateSecureFocusButton(text)
+            else
+                focusTargetTimer = NewTimer(4, UpdateFocusTarget)
+            end
+        end
+
+        focusTargetTimer = NewTimer(4, UpdateFocusTarget)
+    end
+
+    -- HACK: quickly create the focus castbar if it doesnt exist and hide it.
+    -- This is just to make anchoring easier for self.FocusFrame on first usage
+    if not activeFrames.focus then
+        local pos = ClassicCastbarsDB.focus.position
+        local castbar = self:GetCastbarFrame("focus")
+        castbar:ClearAllPoints()
+        castbar:SetParent(UIParent)
+        castbar:SetPoint(pos[1], UIParent, pos[2], pos[3])
+    end
+
+    self.FocusFrame.Text:SetText(isInCombat and text .. " (|cffff0000P|r)" or text)
+    self.FocusFrame:SetAllPoints(activeFrames.focus)
 end

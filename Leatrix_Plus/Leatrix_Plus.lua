@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- 	Leatrix Plus 1.13.40 (11th December 2019)
+-- 	Leatrix Plus 1.13.48 (5th February 2020)
 ----------------------------------------------------------------------
 
 --	01:Functions	20:Live			50:RunOnce		70:Logout			
@@ -20,7 +20,7 @@
 	local void
 
 --	Version
-	LeaPlusLC["AddonVer"] = "1.13.40"
+	LeaPlusLC["AddonVer"] = "1.13.48"
 	LeaPlusLC["RestartReq"] = nil
 
 --	If client restart is required and has not been done, show warning and quit
@@ -1050,6 +1050,17 @@
 							or npcID == "15765" -- Officer Redblade (Orgrimmar Commendations)
 							or npcID == "15767" -- Officer Thunderstrider (Thunder Bluff Commendations)
 							or npcID == "15761" -- Officer Vu'Shalay (Darkspear Commendations)
+							-- Battlemasters
+							or npcID == "15351" -- Alliance Brigadier General (Mark of Honor)
+							or npcID == "15350" -- Horde Warbringer (Mark of Honor)
+							-- Battlegrounds (Alliance)
+							or npcID == "13442" -- Arch Druid Renferal (Storm Crystal, Alterac Valley)
+							-- Battlegrounds (Horde)
+							or npcID == "13236" -- Primalist Thurloga (Stormpike Soldier's Blood, Alterac Valley)
+							-- Scourgestones
+							or npcID == "11039" -- Duke Nicholas Zverenhoff (Eastern Plaguelands)
+							-- Un'Goro crystals
+							or npcID == "9117" 	-- J. D. Collie (Un'Goro Crater)
 							then
 								return true
 							end
@@ -3867,9 +3878,6 @@
 			_G.PlayerFrame_SetLocked = function() end
 			_G.TargetFrame_SetLocked = function() end
 
-			-- Replace buff frame movement function
-			local buffSetPos = BuffFrame.SetPoint
-
 			-- Create and manage container for UIWidgetTopCenterContainerFrame
 			local topCenterHolder = CreateFrame("Frame", "LeaPlusTopCenterContainerHolder", UIParent)
 			topCenterHolder:SetPoint("TOP", UIParent, "TOP", 0, -30)
@@ -3919,11 +3927,7 @@
 			local function LeaFramesSetPos(frame, point, parent, relative, xoff, yoff)
 				frame:SetMovable(true)
 				frame:ClearAllPoints()
-				if frame:GetName() == "BuffFrame" then
-					buffSetPos(BuffFrame, point, parent, relative, xoff, yoff)
-				else
-					frame:SetPoint(point, parent, relative, xoff, yoff)
-				end
+				frame:SetPoint(point, parent, relative, xoff, yoff)
 			end
 
 			-- Set frames to default values
@@ -4190,12 +4194,12 @@
 				end
 			end
 
-			-- Prevent changes to buff frame position
-			hooksecurefunc(BuffFrame, "SetPoint", function()
+			-- Set buff frame position when the game resets it
+			hooksecurefunc("UIParent_UpdateTopFramePositions", function()
 				if LeaPlusDB["Frames"]["BuffFrame"]["Point"] and LeaPlusDB["Frames"]["BuffFrame"]["Relative"] and LeaPlusDB["Frames"]["BuffFrame"]["XOffset"] and LeaPlusDB["Frames"]["BuffFrame"]["YOffset"] then
 					BuffFrame:SetMovable(true)
 					BuffFrame:ClearAllPoints()
-					buffSetPos(BuffFrame, LeaPlusDB["Frames"]["BuffFrame"]["Point"], UIParent, LeaPlusDB["Frames"]["BuffFrame"]["Relative"], LeaPlusDB["Frames"]["BuffFrame"]["XOffset"], LeaPlusDB["Frames"]["BuffFrame"]["YOffset"])
+					BuffFrame:SetPoint(LeaPlusDB["Frames"]["BuffFrame"]["Point"], UIParent, LeaPlusDB["Frames"]["BuffFrame"]["Relative"], LeaPlusDB["Frames"]["BuffFrame"]["XOffset"], LeaPlusDB["Frames"]["BuffFrame"]["YOffset"])
 				end
 			end)
 
@@ -6859,7 +6863,7 @@
 
 		if event == "CONFIRM_SUMMON" then
 			if not UnitAffectingCombat("player") then
-				ConfirmSummon()
+				C_SummonInfo.ConfirmSummon()
 				StaticPopup_Hide("CONFIRM_SUMMON")
 			end
 			return
@@ -8799,7 +8803,7 @@
 	LeaPlusLC:MakeWD(LeaPlusLC[pg], "To begin, choose an options page.", 146, -92);
 
 	LeaPlusLC:MakeTx(LeaPlusLC[pg], "Support", 146, -132);
-	LeaPlusLC:MakeWD(LeaPlusLC[pg], "www.curseforge.com/wow/addons/leatrix-plus-classic", 146, -152);
+	LeaPlusLC:MakeWD(LeaPlusLC[pg], "curseforge.com/wow/addons/leatrix-plus-classic", 146, -152);
 
 ----------------------------------------------------------------------
 -- 	LC1: Automation
