@@ -6,7 +6,7 @@
 
 > Quesite 任务 v5.7.0
 
-> Bagnon 背包 v8.3.4
+> Bagnon 背包 v1.13.3
 
 > AtlasLootClassic 副本掉落 v1.4.5
 
