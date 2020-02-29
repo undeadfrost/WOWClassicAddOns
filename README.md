@@ -14,19 +14,9 @@
 
 > Recount 伤害统计 v8.3.0a
 
-> VendorPrice 物品价格显示 v1.3.0
-
-> RealMobHealth 血量模拟 v2.18
-
-> QuestGuru 任务面板增强 v2.1.7
-
 > ClassicAuraDurations 目标buff debuff显示 v1.13.50
 
 > oGlow 装备染色 v2.2.8
-
-> TinyTooltip 鼠标指针增强 v1.2.1
-
-> ClassicAutoDismount 自动下马 v1.01
 
 > Fizzle 装备耐久度 v80300
 
