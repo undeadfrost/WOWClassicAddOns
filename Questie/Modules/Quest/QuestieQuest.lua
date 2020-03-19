@@ -1,30 +1,32 @@
 ---@class QuestieQuest
-local QuestieQuest = QuestieLoader:CreateModule("QuestieQuest");
+local QuestieQuest = QuestieLoader:CreateModule("QuestieQuest")
 -------------------------
 --Import modules.
 -------------------------
 ---@type QuestieProfessions
-local QuestieProfessions = QuestieLoader:ImportModule("QuestieProfessions");
+local QuestieProfessions = QuestieLoader:ImportModule("QuestieProfessions")
 ---@type QuestieReputation
-local QuestieReputation = QuestieLoader:ImportModule("QuestieReputation");
+local QuestieReputation = QuestieLoader:ImportModule("QuestieReputation")
 ---@type QuestieTooltips
-local QuestieTooltips = QuestieLoader:ImportModule("QuestieTooltips");
+local QuestieTooltips = QuestieLoader:ImportModule("QuestieTooltips")
 ---@type QuestieTracker
-local QuestieTracker = QuestieLoader:ImportModule("QuestieTracker");
+local QuestieTracker = QuestieLoader:ImportModule("QuestieTracker")
 ---@type QuestieDBMIntegration
-local QuestieDBMIntegration = QuestieLoader:ImportModule("QuestieDBMIntegration");
+local QuestieDBMIntegration = QuestieLoader:ImportModule("QuestieDBMIntegration")
 ---@type QuestieFramePool
-local QuestieFramePool = QuestieLoader:ImportModule("QuestieFramePool");
+local QuestieFramePool = QuestieLoader:ImportModule("QuestieFramePool")
 ---@type QuestieMap
-local QuestieMap = QuestieLoader:ImportModule("QuestieMap");
+local QuestieMap = QuestieLoader:ImportModule("QuestieMap")
 ---@type QuestieLib
-local QuestieLib = QuestieLoader:ImportModule("QuestieLib");
+local QuestieLib = QuestieLoader:ImportModule("QuestieLib")
 ---@type QuestieHash
-local QuestieHash = QuestieLoader:ImportModule("QuestieHash");
+local QuestieHash = QuestieLoader:ImportModule("QuestieHash")
 ---@type QuestiePlayer
-local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer");
+local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer")
 ---@type QuestieDB
-local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+local QuestieDB = QuestieLoader:ImportModule("QuestieDB")
+---@type QuestieCorrections
+local QuestieCorrections = QuestieLoader:ImportModule("QuestieCorrections")
 
 local _QuestieQuest = QuestieQuest.private
 local libS = LibStub:GetLibrary("AceSerializer-3.0")
@@ -72,6 +74,7 @@ function QuestieQuest:ToggleNotes(desiredValue)
         for questId, framelist in pairs(QuestieMap.questIdFrames) do
             if (trackerHiddenQuests == nil) or (trackerHiddenQuests[questId] == nil) then -- Skip quests which are completly hidden from the Tracker menu
                 for _, frameName in pairs(framelist) do -- this may seem a bit expensive, but its actually really fast due to the order things are checked
+                    ---@type IconFrame
                     local icon = _G[frameName];
                     if icon.data == nil then
                         error("Desync! Icon has not been removed correctly, but has already been resetted. Skipping frame \"" .. frameName .. "\" for quest " .. questId)
@@ -79,12 +82,8 @@ function QuestieQuest:ToggleNotes(desiredValue)
                     else
                         local objectiveString = tostring(questId) .. " " .. tostring(icon.data.ObjectiveIndex)
                         if (questieCharDB.TrackerHiddenObjectives == nil) or (questieCharDB.TrackerHiddenObjectives[objectiveString] == nil) then
-                            if icon ~= nil and icon.hidden and not ((((not questieGlobalDB.enableObjectives) and (icon.data.Type == "monster" or icon.data.Type == "object" or icon.data.Type == "event" or icon.data.Type == "item"))
-                                or ((not questieGlobalDB.enableTurnins) and icon.data.Type == "complete")
-                                or ((not questieGlobalDB.enableAvailable) and icon.data.Type == "available"))
-                                or ((not questieGlobalDB.enableMapIcons) and (not icon.miniMapIcon))
-                                or ((not questieGlobalDB.enableMiniMapIcons) and (icon.miniMapIcon))) or (icon.data.ObjectiveData and icon.data.ObjectiveData.HideIcons) or (icon.data.QuestData and icon.data.QuestData.HideIcons and icon.data.Type ~= "complete") then
-                                    icon:FakeUnhide()
+                            if icon ~= nil and icon.hidden and (not icon:ShouldBeHidden()) then
+                                icon:FakeUnhide()
                             end
                         end
                     end
@@ -251,13 +250,10 @@ function QuestieQuest:UpdateHiddenNotes()
     -- Update hidden status of quest notes
     for questId, framelist in pairs(QuestieMap.questIdFrames) do
         for index, frameName in pairs(framelist) do -- this may seem a bit expensive, but its actually really fast due to the order things are checked
+            ---@type IconFrame
             local icon = _G[frameName];
             if icon ~= nil and icon.data then
-                if (QuestieQuest.NotesHidden or (((not questieGlobalDB.enableObjectives) and (icon.data.Type == "monster" or icon.data.Type == "object" or icon.data.Type == "event" or icon.data.Type == "item"))
-                 or ((not questieGlobalDB.enableTurnins) and icon.data.Type == "complete")
-                 or ((not questieGlobalDB.enableAvailable) and icon.data.Type == "available"))
-                 or ((not questieGlobalDB.enableMapIcons) and (not icon.miniMapIcon))
-                 or ((not questieGlobalDB.enableMiniMapIcons) and (icon.miniMapIcon))) or (icon.data.ObjectiveData and icon.data.ObjectiveData.HideIcons) or (icon.data.QuestData and icon.data.QuestData.HideIcons and icon.data.Type ~= "complete") then
+                if icon:ShouldBeHidden() then
                     icon:FakeHide()
                 else
                     icon:FakeUnhide()
@@ -376,7 +372,7 @@ function QuestieQuest:CompleteQuest(quest)
     local questId = quest.Id
     QuestiePlayer.currentQuestlog[questId] = nil;
     -- Only quests that aren't repeatable should be marked complete, otherwise objectives for repeatable quests won't track correctly - #1433
-    Questie.db.char.complete[questId] = not quest.Repeatable
+    Questie.db.char.complete[questId] = not quest.IsRepeatable
 
     QuestieHash:RemoveQuestHash(questId)
 
@@ -1276,14 +1272,12 @@ function _QuestieQuest:DrawAvailableQuest(quest) -- prevent recursion
     elseif(quest.Starts["NPC"] ~= nil)then
         for _, NPCID in ipairs(quest.Starts["NPC"]) do
             local NPC = QuestieDB:GetNPC(NPCID)
-            if (NPC ~= nil and NPC.spawns ~= nil and NPC.friendly) then
+            if (NPC ~= nil and NPC.spawns ~= nil) then
                 --Questie:Debug(DEBUG_DEVELOP,"Adding Quest:", questObject.Id, "StarterNPC:", NPC.Id)
                 for npcZone, Spawns in pairs(NPC.spawns) do
                     if(npcZone ~= nil and Spawns ~= nil) then
-                        --Questie:Debug("Zone", Zone)
-                        --Questie:Debug("Qid:", questid)
+
                         for _, coords in ipairs(Spawns) do
-                            --Questie:Debug("Coords", coords[1], coords[2])
                             local data = {}
                             data.Id = quest.Id;
                             data.Icon = _QuestieQuest:GetQuestIcon(quest)
@@ -1388,7 +1382,7 @@ function _QuestieQuest:GetQuestIcon(questObject)
     local icon = {}
     if questObject.requiredLevel > QuestiePlayer.GetPlayerLevel() then
         icon = ICON_TYPE_AVAILABLE_GRAY
-    elseif questObject.Repeatable then
+    elseif questObject.IsRepeatable then
         icon = ICON_TYPE_REPEATABLE
     elseif(questObject:IsTrivial()) then
         icon = ICON_TYPE_AVAILABLE_GRAY
@@ -1428,20 +1422,6 @@ function _QuestieQuest:IsDoable(quest)
         return _QuestieQuest:IsParentQuestActive(quest.parentQuest)
     end
 
-    -- check if npc is friendly
-    if quest.Starts["NPC"] ~= nil then
-        local hasValidNPC = false
-        for _, id in ipairs(quest.Starts["NPC"]) do
-            if QuestieDB:GetNPC(id).friendly then
-                hasValidNPC = true
-                break
-            end
-        end
-        if not hasValidNPC then
-            return false
-        end
-    end
-
     if not QuestieProfessions:HasProfessionAndSkill(quest.requiredSkill) then
         return false
     end
@@ -1468,6 +1448,10 @@ function QuestieQuest:CalculateAvailableQuests()
     local playerLevel = QuestiePlayer:GetPlayerLevel()
     local minLevel = playerLevel - Questie.db.global.minLevelFilter
     local maxLevel = playerLevel + Questie.db.global.maxLevelFilter
+    if Questie.db.char.manualMinLevelOffsetAbsolute then
+        minLevel = Questie.db.global.minLevelFilter
+        maxLevel = Questie.db.global.maxLevelFilter
+    end
     local showRepeatableQuests = Questie.db.char.showRepeatableQuests
     local showDungeonQuests = Questie.db.char.showDungeonQuests
     local showPvPQuests = Questie.db.char.showPvPQuests
@@ -1478,27 +1462,27 @@ function QuestieQuest:CalculateAvailableQuests()
 
     QuestieQuest.availableQuests = {}
 
-    for questID, v in pairs(QuestieDB.questData) do
-        local quest = QuestieDB:GetQuest(questID)
+    for questId, _ in pairs(QuestieDB.questData) do
+        local quest = QuestieDB:GetQuest(questId)
 
         --Check if we've already completed the quest and that it is not "manually" hidden and that the quest is not currently in the questlog.
         if(
-            (not Questie.db.char.complete[questID]) and -- Don't show completed quests
-            ((not QuestiePlayer.currentQuestlog[questID]) or QuestieQuest:IsComplete(quest) == -1) and -- Don't show quests if they're already in the quest log
-            (not QuestieCorrections.hiddenQuests[questID]) and -- Don't show blacklisted quests
-            ((not quest.Repeatable) or (quest.Repeatable and showRepeatableQuests)) and -- Show repeatable quests if the quest is repeatable and the option is enabled
-            ((not quest.isDungeonQuest) or (quest.isDungeonQuest and showDungeonQuests)) and -- Show dungeon quests only with the option enabled
-            ((not quest.isPvPQuest) or (quest.isPvPQuest and showPvPQuests)) -- Show PvP quests only with the option enabled
+            (not Questie.db.char.complete[questId]) and -- Don't show completed quests
+            ((not QuestiePlayer.currentQuestlog[questId]) or QuestieQuest:IsComplete(quest) == -1) and -- Don't show quests if they're already in the quest log
+            (not QuestieCorrections.hiddenQuests[questId]) and -- Don't show blacklisted quests
+            (showRepeatableQuests or (not quest.IsRepeatable)) and  -- Show repeatable quests if the quest is repeatable and the option is enabled
+            (showDungeonQuests or (not quest:IsDungeonQuest())) and  -- Show dungeon quests only with the option enabled
+            (showPvPQuests or (not quest:IsPvPQuest())) -- Show PvP quests only with the option enabled
         ) then
 
             if quest and _QuestieQuest:LevelRequirementsFulfilled(quest, playerLevel, minLevel, maxLevel) then
                 if _QuestieQuest:IsDoable(quest) then
-                    QuestieQuest.availableQuests[questID] = questID
+                    QuestieQuest.availableQuests[questId] = questId
                 end
             else
                 --If the quests are not within level range we want to unload them
                 --(This is for when people level up or change settings etc)
-                QuestieMap:UnloadQuestFrames(questID);
+                QuestieMap:UnloadQuestFrames(questId);
             end
         end
     end

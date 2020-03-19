@@ -4,7 +4,6 @@ local PoolManager = namespace.PoolManager
 
 local addon = namespace.addon
 local activeFrames = addon.activeFrames
-local gsub = _G.string.gsub
 local strfind = _G.string.find
 local unpack = _G.unpack
 local min = _G.math.min
@@ -159,12 +158,7 @@ function addon:DisplayCastbar(castbar, unitID)
     local parentFrame = AnchorManager:GetAnchor(unitID)
     if not parentFrame then return end
 
-    local db = self.db[gsub(unitID, "%d", "")] -- nameplate1 -> nameplate
-    if unitID == "nameplate-testmode" then
-        db = self.db.nameplate
-    elseif unitID == "party-testmode" then
-        db = self.db.party
-    end
+    local db = self.db[self:GetUnitType(unitID)]
 
     if not castbar.animationGroup then
         castbar.animationGroup = castbar:CreateAnimationGroup()
@@ -215,7 +209,7 @@ function addon:DisplayCastbar(castbar, unitID)
     castbar:Show()
 end
 
-function addon:HideCastbar(castbar, noFadeOut)
+function addon:HideCastbar(castbar, unitID, noFadeOut)
     if noFadeOut then
         castbar:SetAlpha(0)
         castbar:Hide()
@@ -223,9 +217,9 @@ function addon:HideCastbar(castbar, noFadeOut)
     end
 
     local cast = castbar._data
-    if cast and cast.isInterrupted then -- SPELL_INTERRUPT
-        castbar.Text:SetText(_G.INTERRUPTED)
-        castbar:SetStatusBarColor(castbar.failedCastColor:GetRGB())
+    if cast and (cast.isInterrupted or cast.isFailed) then
+        castbar.Text:SetText(cast.isInterrupted and _G.INTERRUPTED or _G.FAILED)
+        castbar:SetStatusBarColor(unpack(self.db[self:GetUnitType(unitID)].statusColorFailed))
         castbar:SetMinMaxValues(0, 1)
         castbar:SetValue(1)
         castbar.Spark:SetAlpha(0)
@@ -235,6 +229,11 @@ function addon:HideCastbar(castbar, noFadeOut)
         if castbar.Border:GetAlpha() == 1 then -- not using LSM borders
             local tex = castbar.Border:GetTexture()
             if tex == "Interface\\CastingBar\\UI-CastingBar-Border" or tex == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then
+                if not cast.isChanneled then
+                    castbar.Flash:SetVertexColor(1, 1, 1)
+                else
+                    castbar.Flash:SetVertexColor(0, 1, 0)
+                end
                 castbar.Flash:Show()
             end
         end
@@ -249,20 +248,14 @@ function addon:HideCastbar(castbar, noFadeOut)
         end
     end
 
-    if cast and cast.isCastMaybeComplete then
-        castbar.Spark:SetAlpha(0)
-        -- color castbar slightly yellow when its not 100% sure if the cast is casted or canceled
-        if not cast.isChanneled then
-            castbar:SetStatusBarColor(1, 0.78, 0, 1)
-            castbar:SetMinMaxValues(0, 1)
-            castbar:SetValue(1)
-        else
-            castbar:SetValue(0)
-        end
-    end
-
     if castbar:GetAlpha() > 0 and castbar.fade then
-        castbar.fade:SetDuration(cast and cast.isInterrupted and 1.5 or 0.3)
+        castbar.fade:SetStartDelay(0) -- reset
+        if cast then
+            if cast.isInterrupted or cast.isFailed then
+                castbar.fade:SetStartDelay(0.5)
+            end
+        end
+        castbar.fade:SetDuration(cast and cast.isInterrupted and 1.2 or 0.3)
         castbar.animationGroup:Play()
     end
 end
@@ -277,7 +270,10 @@ function addon:SkinPlayerCastbar()
         CastingBarFrame.Timer:SetFontObject("SystemFont_Shadow_Small")
         CastingBarFrame:HookScript("OnUpdate", function(frame)
             if db.enabled and db.showTimer then
-                frame.Timer:SetPoint("RIGHT", CastingBarFrame, (frame.Text:GetText():len() >= 19) and 30 or -6, 0)
+                local spellText = frame.Text and frame.Text:GetText()
+                if spellText then
+                    frame.Timer:SetPoint("RIGHT", CastingBarFrame, (spellText:len() >= 19) and 30 or -6, 0)
+                end
 
                 if frame.fadeOut or (not frame.casting and not frame.channeling) then
                     -- just show no text at zero, the numbers looks kinda weird when Flash animation is playing
@@ -299,7 +295,6 @@ function addon:SkinPlayerCastbar()
             if frame.Icon:GetTexture() == 136235 then
                 frame.Icon:SetTexture(136243)
             end
-            frame.Timer:SetPoint("RIGHT", CastingBarFrame, (frame.Text:GetText():len() >= 19) and 30 or -6, 0)
         end)
 
         hooksecurefunc("PlayerFrame_DetachCastBar", function()
@@ -324,7 +319,7 @@ function addon:SkinPlayerCastbar()
 	CastingBarFrame_SetStartChannelColor(CastingBarFrame, unpack(db.statusColorChannel))
 	--CastingBarFrame_SetFinishedCastColor(CastingBarFrame, unpack(db.statusColor))
 	--CastingBarFrame_SetNonInterruptibleCastColor(CastingBarFrame, 0.7, 0.7, 0.7)
-    --CastingBarFrame_SetFailedCastColor(CastingBarFrame, 1.0, 0.0, 0.0)
+    CastingBarFrame_SetFailedCastColor(CastingBarFrame, unpack(db.statusColorFailed))
     if CastingBarFrame.isTesting then
         CastingBarFrame:SetStatusBarColor(CastingBarFrame.startCastColor:GetRGB())
     end
