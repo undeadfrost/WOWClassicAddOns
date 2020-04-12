@@ -33,3 +33,5 @@
 > ThreatClassic2 仇恨统计插件 v2.12
 
 > whoaThickFrames_Classic 头像增强 v1.3.9
+
+> GearMenu 装备切换 v1.3.0
