@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- 	Leatrix Plus 1.13.56 (1st April 2020)
+-- 	Leatrix Plus 1.13.58 (15th April 2020)
 ----------------------------------------------------------------------
 
 --	01:Functions	20:Live			50:RunOnce		70:Logout			
@@ -20,7 +20,7 @@
 	local void
 
 --	Version
-	LeaPlusLC["AddonVer"] = "1.13.56"
+	LeaPlusLC["AddonVer"] = "1.13.58"
 	LeaPlusLC["RestartReq"] = nil
 
 --	If client restart is required and has not been done, show warning and quit
@@ -475,16 +475,6 @@
 		end
 
 		----------------------------------------------------------------------
-		--	Release in PvP
-		----------------------------------------------------------------------
-
-		if LeaPlusLC["AutoReleasePvP"] == "On" then
-			LpEvt:RegisterEvent("PLAYER_DEAD");
-		else
-			LpEvt:UnregisterEvent("PLAYER_DEAD");
-		end
-
-		----------------------------------------------------------------------
 		--	Accept resurrection
 		----------------------------------------------------------------------
 
@@ -930,6 +920,7 @@
 						-- Ignore specific NPCs for selecting, accepting and turning-in quests (required if automation has consequences)
 						if npcID == "15192"	-- Anachronos (Caverns of Time)
 						or npcID == "3430" 	-- Mangletooth (Blood Shard quests, Barrens)
+						or npcID == "14828" -- Gelvas Grimegate (Darkmoon Faire Ticket Redemption, Elwynn Forest and Mulgore)
 						then
 							return true
 						end
@@ -1061,6 +1052,8 @@
 							or npcID == "11039" -- Duke Nicholas Zverenhoff (Eastern Plaguelands)
 							-- Un'Goro crystals
 							or npcID == "9117" 	-- J. D. Collie (Un'Goro Crater)
+							-- E'Ko
+							or npcID == "10307" -- Witch Doctor Mau'ari (Winterspring)
 							then
 								return true
 							end
@@ -2335,6 +2328,27 @@
 ----------------------------------------------------------------------
 
 	function LeaPlusLC:Player()
+
+		----------------------------------------------------------------------
+		-- Automatically release in battlegrounds
+		----------------------------------------------------------------------
+
+		do
+
+			hooksecurefunc("StaticPopup_Show", function(sType)
+				if sType and sType == "DEATH" and LeaPlusLC["AutoReleasePvP"] == "On" then
+					if C_DeathInfo.GetSelfResurrectOptions() and #C_DeathInfo.GetSelfResurrectOptions() > 0 then return end
+					local InstStat, InstType = IsInInstance()
+					if InstStat and InstType == "pvp" then
+						local dialog = StaticPopup_Visible("DEATH")
+						if dialog then
+							StaticPopup_OnClick(_G[dialog], 1)
+						end
+					end
+				end
+			end)
+
+		end
 
 		----------------------------------------------------------------------
 		--	Class icon portraits
@@ -6935,26 +6949,6 @@
 		if event == "MAIL_LOCK_SEND_ITEMS" then
 			RespondMailLockSendItem(arg1, true)
 			return
-		end
-
-		----------------------------------------------------------------------
-		-- Automatically release in battlegrounds
-		----------------------------------------------------------------------
-
-		if event == "PLAYER_DEAD" then
-
-			-- If player has ability to self-resurrect (soulstone, reincarnation, etc), do nothing and quit
-			if C_DeathInfo.GetSelfResurrectOptions() and #C_DeathInfo.GetSelfResurrectOptions() > 0 then return end
-
-			-- Resurrect if player is in a battleground
-			local InstStat, InstType = IsInInstance()
-			if InstStat and InstType == "pvp" then
-				RepopMe()
-				return
-			end
-
-			return
-
 		end
 
 		----------------------------------------------------------------------
