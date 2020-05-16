@@ -39,3 +39,5 @@
 > LoseControl 受控提醒 v1.04
 
 > BMM 小地图按钮整合 v4.0.1
+
+> OmniBar 敌对技能冷却监控 v10.8
